@@ -10,7 +10,7 @@ router.get("/", (req,res) => {
 })
 
 //GET BY ID
-router.get("/:id", validateActionID, (req, res) => {
+router.get("/:id", (req, res) => {
     const id = req.params.id;
     db.get(id)
       .then(actions => {
@@ -20,20 +20,42 @@ router.get("/:id", validateActionID, (req, res) => {
         res.status(500).json({ err: err });
       });
   });
-  
 
+  //PUT 
+  router.put("/:id", (req, res) => {
+    const id = req.params.id;
+    const changes = req.body;
   
-  //middleware
-  function validateActionID(req, res, next) {
-    const { id } = req.params;
+    db.update(id, changes)
+      .then(update => {
+        res.status(200).json(update);
+      })
+      .catch(err => {
+        res.status(500).json({ message: "PUT failed" });
+      });
+  });
+
+  //POST
+  router.post("/", (req, res) => {
+    db.insert(req.body).then((action) =>
+      res
+        .status(200)
+        .json({ message: "Updated" })
+        .catch(err =>
+          res.status(500).json({ message: "Unavailable" })
+        )
+    );
+  });
+
+  //DELETE
+  router.delete("/:id", (req, res) => {
+    const id = req.params.id;
   
-    Actions.get(id).then(action => {
-      if (action) {
-        next();
-      } else {
-        res.status(400).json({ message: "Please provide a valid ID" });
-      }
+    db.remove(id).then(response => {
+      res.status(200).json({
+        Deleted: "Deleted Successfully"
+      });
     });
-  }
+  });
 
 module.exports = router;
