@@ -15,12 +15,14 @@ router.get("/", (req, res) => {
 
 //GET BY ID
 router.get("/:id", (req, res) => {
-  const projects = req.projects;
-  if (projects) {
-    res.status(200).json(projects);
-  } else {
-    res.status(500).json({ message: "Can not find" });
-  }
+  const id = req.params.id;
+  db.get(id)
+    .then(projects => {
+      res.status(200).json({ projects });
+    })
+    .catch(err => {
+      res.status(500).json({ err: err });
+    });
 });
 
 //POST
